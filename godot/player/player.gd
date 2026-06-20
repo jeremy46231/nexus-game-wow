@@ -15,6 +15,8 @@ const title = preload("res://title/title.tscn")
 @export var other_player: Player
 
 var is_dead = false
+var isSmol := false;
+const SCALE_FACTOR := 0.5
 
 # movement vars
 # horizontal
@@ -35,11 +37,8 @@ const jump_cut_factor: float = 0.4
 # coyote time! :D (and other buffer time)
 const coyote_time: float = 0.1
 const jump_buffer_time: float = 0.1
-# shrink toggle
-const SCALE_FACTOR = 0.5
-
-# player is 16x16
-const HALF := Vector2(8, 8)
+# how far above the resting gap a rider can drift before it detaches
+const ride_gap_slack: float = 3.0
 
 # timers
 var _coyote_timer: float = 0.0
@@ -87,10 +86,8 @@ func _physics_process(delta: float) -> void:
 
 	# shrink / grow toggle
 	if Input.is_action_just_pressed(smol_action):
-		if scale.x == SCALE_FACTOR:
-			scale = Vector2(1, 1)
-		else:
-			scale = Vector2(SCALE_FACTOR, SCALE_FACTOR)
+		# _set_smol(true)
+		_set_smol(!isSmol)
 
 	# horizontal movement
 	var direction := Input.get_axis(left_action, right_action)
@@ -128,19 +125,32 @@ func _set_riding(value: bool) -> void:
 	# rider must run after carrier
 	process_physics_priority = 1 if value else 0
 
+func _set_smol(value: bool) -> void:
+	if isSmol == value:
+		return
+	isSmol = value;
+	scale = Vector2(SCALE_FACTOR, SCALE_FACTOR) if value else Vector2(1, 1)
+
+func _get_half_size() -> Vector2:
+	return Vector2(4, 4) if isSmol else Vector2(8, 8)
+	
+func _get_other_half_size() -> Vector2:
+	return Vector2(4, 4) if other_player.isSmol else Vector2(8, 8)
 
 # bounding box, global
 func _rect() -> Rect2:
-	return Rect2(global_position - HALF, HALF * 2.0)
+	return Rect2(global_position - _get_half_size(), _get_half_size() * 2.0)
 
 
 func _resolve_other() -> void:
 	# already riding: keep sticking until we slide off the side or the carrier
 	# rises above us (e.g. we got stopped by a ceiling)
 	if _riding:
+		var sep := _get_half_size() + _get_other_half_size()
 		var dx := absf(global_position.x - other_player._frame_start_pos.x)
-		var gap := other_player._frame_start_pos.y - global_position.y
-		if dx < 2.0 * HALF.x and gap > 0.0 and gap < 6.0 * HALF.y:
+
+		var gap := other_player._frame_start_pos.y - _frame_start_pos.y
+		if dx < sep.x and gap > 0.0 and gap < sep.y + ride_gap_slack:
 			# stick to them
 			_stick_to(other_player)
 		else:
@@ -164,23 +174,34 @@ func _resolve_other() -> void:
 			_stick_to(other_player)
 		# if I'm the bottom one, I do nothing special
 	else:
-		# mostly side-by-side, push apart
+		# mostly side-by-side
 		var dir := signf(a.get_center().x - b.get_center().x)
 		if dir == 0.0:
 			dir = 1.0
-		move_and_collide(Vector2(dir * overlap_x * 0.5, 0.0))
+		var half := overlap_x * 0.5
+		# shove the other player out by up to half
+		var other_col := other_player.move_and_collide(Vector2(-dir * half, 0.0))
+		var other_moved := absf(other_col.get_travel().x) if other_col != null else half
+		# move ourselves out by whatever overlap remains (more if they hit a wall)
+		var my_request := overlap_x - other_moved
+		var my_col := move_and_collide(Vector2(dir * my_request, 0.0))
+		var my_moved := absf(my_col.get_travel().x) if my_col != null else my_request
+		# if we hit a wall too, push the leftover back onto the other player
+		var leftover := my_request - my_moved
+		if leftover > 0.0:
+			other_player.move_and_collide(Vector2(-dir * leftover, 0.0))
 
 
 # lock onto the carrier, match its height exactly and follow whatever
 # horizontal distance it moved this frame
 func _stick_to(carrier: Player) -> void:
-	var target_y := carrier.global_position.y - 2.0 * HALF.y
+	var target_y := carrier.global_position.y - (_get_half_size() + _get_other_half_size()).y
 	var dy := target_y - global_position.y
 	var hit := move_and_collide(Vector2(0.0, dy))
 
 	# carrier pushed us into a ceiling, shove it back down and zero velocity
 	if hit != null and dy < 0.0:
-		var push_down := (global_position.y + 2.0 * HALF.y) - carrier.global_position.y
+		var push_down := (global_position.y + (_get_half_size() + _get_other_half_size()).y) - carrier.global_position.y
 		if push_down > 0.0:
 			carrier.move_and_collide(Vector2(0.0, push_down))
 			if carrier.velocity.y < 0.0:
@@ -193,7 +214,6 @@ func _stick_to(carrier: Player) -> void:
 	velocity.y = carrier.velocity.y
 
 func _set_anim() -> void:
-
 	if velocity.y == 0:
 		if velocity.x == 0:
 			anim.play("idle")
