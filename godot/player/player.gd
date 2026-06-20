@@ -31,9 +31,9 @@ const SMOL_SPRITE_SCALE := Vector2(0.5, 0.5)
 # movement vars
 # horizontal
 const speed: float = 300.0
-const acceleration: float = 2000.0
+const acceleration: float = 4000.0
 const friction: float = 2400.0
-const air_acceleration: float = 1200.0
+const air_acceleration: float = 2000.0
 const air_friction: float = 400.0
 # jump
 const jump_velocity: float = -400.0
