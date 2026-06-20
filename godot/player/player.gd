@@ -2,19 +2,28 @@ class_name Player
 extends CharacterBody2D
 
 @onready var anim: AnimatedSprite2D = $AnimatedSprite2D
+@onready var _collision: CollisionShape2D = $CollisionShape2D
 
 # keybinds
 @export var jump_action: StringName = "p1_jump"
 @export var left_action: StringName = "p1_left"
 @export var right_action: StringName = "p1_right"
 @export var smol_action: StringName = "p1_smol"
-@export var teleport_action: StringName = "p1_teleport"
+@export var call_action: StringName = "p1_call"
 
 # the other player (wired up in the scene)
 @export var other_player: Player
 
-var isSmol := false;
-const SCALE_FACTOR := 0.5
+var isSmol := false
+
+# smol shrinks the collision shape + sprite rather than scaling the body node:
+# scaling a CharacterBody2D breaks collisions and would wreck the fused "call" state.
+# (full bottom edge sits at +8, smol at +4, so the feet line up the same way)
+const FULL_SHAPE_SIZE := Vector2(15.75, 15.75)
+const SMOL_SHAPE_SIZE := Vector2(7.875, 7.875)
+const FULL_SHAPE_OFFSET := Vector2(0, 0.125)
+const SMOL_SHAPE_OFFSET := Vector2(0, 0.0625)
+const SMOL_SPRITE_SCALE := Vector2(0.5, 0.5)
 
 # movement vars
 # horizontal
@@ -52,6 +61,9 @@ var _frame_start_pos: Vector2
 
 func _ready() -> void:
 	_frame_start_pos = global_position
+	# private copy of the shape so resizing for smol doesn't mutate the other
+	# player's (potentially shared) shape resource
+	_collision.shape = _collision.shape.duplicate()
 
 func _physics_process(delta: float) -> void:
 	_frame_start_pos = global_position
@@ -99,9 +111,9 @@ func _physics_process(delta: float) -> void:
 		var fric := friction if on_floor else air_friction
 		velocity.x = move_toward(velocity.x, 0.0, fric * delta)
 
-	# teleport / "call" the other player to us
+	# "call" the other player to us
 	# TODO: do
-	if Input.is_action_just_pressed(teleport_action):
+	if Input.is_action_just_pressed(call_action):
 		pass
 
 	_set_anim()
@@ -124,8 +136,11 @@ func _set_riding(value: bool) -> void:
 func _set_smol(value: bool) -> void:
 	if isSmol == value:
 		return
-	isSmol = value;
-	scale = Vector2(SCALE_FACTOR, SCALE_FACTOR) if value else Vector2(1, 1)
+	isSmol = value
+	var rect := _collision.shape as RectangleShape2D
+	rect.size = SMOL_SHAPE_SIZE if value else FULL_SHAPE_SIZE
+	_collision.position = SMOL_SHAPE_OFFSET if value else FULL_SHAPE_OFFSET
+	anim.scale = SMOL_SPRITE_SCALE if value else Vector2.ONE
 
 func _get_half_size() -> Vector2:
 	return Vector2(4, 4) if isSmol else Vector2(8, 8)

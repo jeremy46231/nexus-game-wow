@@ -105,7 +105,7 @@ jump_action = &"p2_jump"
 left_action = &"p2_left"
 right_action = &"p2_right"
 smol_action = &"p2_smol"
-teleport_action = &"p2_teleport"
+call_action = &"p2_call"
 other_player = NodePath("../Player")
 
 [node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=1005016217]
