@@ -96,11 +96,11 @@ sources/0 = SubResource("TileSetAtlasSource_xwkvk")
 script = ExtResource("1_53q0u")
 
 [node name="Player" parent="." unique_id=428086679 node_paths=PackedStringArray("other_player") instance=ExtResource("2_pjrb6")]
-position = Vector2(233, 456)
+position = Vector2(89, 120)
 other_player = NodePath("../Player2")
 
 [node name="Player2" parent="." unique_id=428086680 node_paths=PackedStringArray("other_player") instance=ExtResource("2_pjrb6")]
-position = Vector2(826, 456)
+position = Vector2(382, 159)
 jump_action = &"p2_jump"
 left_action = &"p2_left"
 right_action = &"p2_right"
