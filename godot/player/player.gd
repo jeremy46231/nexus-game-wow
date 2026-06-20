@@ -13,6 +13,9 @@ extends CharacterBody2D
 # the other player (wired up in the scene)
 @export var other_player: Player
 
+var isSmol := false;
+const SCALE_FACTOR := 0.5
+
 # movement vars
 # horizontal
 const speed: float = 300.0
@@ -32,11 +35,6 @@ const jump_cut_factor: float = 0.4
 # coyote time! :D (and other buffer time)
 const coyote_time: float = 0.1
 const jump_buffer_time: float = 0.1
-# shrink toggle
-const SCALE_FACTOR = 0.5
-
-# player is 16x16
-const HALF := Vector2(8, 8)
 
 # timers
 var _coyote_timer: float = 0.0
@@ -84,10 +82,8 @@ func _physics_process(delta: float) -> void:
 
 	# shrink / grow toggle
 	if Input.is_action_just_pressed(smol_action):
-		if scale.x == SCALE_FACTOR:
-			scale = Vector2(1, 1)
-		else:
-			scale = Vector2(SCALE_FACTOR, SCALE_FACTOR)
+		# _set_smol(true)
+		_set_smol(!isSmol)
 
 	# horizontal movement
 	var direction := Input.get_axis(left_action, right_action)
@@ -123,10 +119,21 @@ func _set_riding(value: bool) -> void:
 	# rider must run after carrier
 	process_physics_priority = 1 if value else 0
 
+func _set_smol(value: bool) -> void:
+	if isSmol == value:
+		return
+	isSmol = value;
+	scale = Vector2(SCALE_FACTOR, SCALE_FACTOR) if value else Vector2(1, 1)
+
+func _get_half_size() -> Vector2:
+	return Vector2(4, 4) if isSmol else Vector2(8, 8)
+	
+func _get_other_half_size() -> Vector2:
+	return Vector2(4, 4) if other_player.isSmol else Vector2(8, 8)
 
 # bounding box, global
 func _rect() -> Rect2:
-	return Rect2(global_position - HALF, HALF * 2.0)
+	return Rect2(global_position - _get_half_size(), _get_half_size() * 2.0)
 
 
 func _resolve_other() -> void:
@@ -135,7 +142,7 @@ func _resolve_other() -> void:
 	if _riding:
 		var dx := absf(global_position.x - other_player._frame_start_pos.x)
 		var gap := other_player._frame_start_pos.y - global_position.y
-		if dx < 2.0 * HALF.x and gap > 0.0 and gap < 6.0 * HALF.y:
+		if dx < (_get_half_size() + _get_other_half_size()).x and gap > 0.0 and gap < (_get_half_size() + _get_other_half_size()).y:
 			# stick to them
 			_stick_to(other_player)
 		else:
@@ -169,13 +176,13 @@ func _resolve_other() -> void:
 # lock onto the carrier, match its height exactly and follow whatever
 # horizontal distance it moved this frame
 func _stick_to(carrier: Player) -> void:
-	var target_y := carrier.global_position.y - 2.0 * HALF.y
+	var target_y := carrier.global_position.y - (_get_half_size() + _get_other_half_size()).y
 	var dy := target_y - global_position.y
 	var hit := move_and_collide(Vector2(0.0, dy))
 
 	# carrier pushed us into a ceiling, shove it back down and zero velocity
 	if hit != null and dy < 0.0:
-		var push_down := (global_position.y + 2.0 * HALF.y) - carrier.global_position.y
+		var push_down := (global_position.y + (_get_half_size() + _get_other_half_size()).y) - carrier.global_position.y
 		if push_down > 0.0:
 			carrier.move_and_collide(Vector2(0.0, push_down))
 			if carrier.velocity.y < 0.0:
@@ -188,7 +195,6 @@ func _stick_to(carrier: Player) -> void:
 	velocity.y = carrier.velocity.y
 
 func _set_anim() -> void:
-
 	if velocity.y == 0:
 		if velocity.x == 0:
 			anim.play("idle")
