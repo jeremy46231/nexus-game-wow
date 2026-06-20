@@ -133,7 +133,6 @@ script = ExtResource("1_oul6g")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1793714119]
 texture_filter = 1
 sprite_frames = SubResource("SpriteFrames_lgort")
-animation = &"left"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1122835623]
 position = Vector2(0, 0.125)
