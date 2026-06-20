@@ -50,6 +50,9 @@ const jump_buffer_time: float = 0.1
 # how far above the resting gap a rider can drift before it detaches
 const ride_gap_slack: float = 3.0
 
+# fall below this y and you boom
+const death_y: float = 2000.0
+
 # timers
 var _coyote_timer: float = 0.0
 var _buffer_timer: float = 0.0
@@ -327,6 +330,10 @@ func _on_death() -> void:
 		get_tree().change_scene_to_file("res://title/title.tscn")
 
 func check_collisions() -> void:
+	if global_position.y > death_y:
+		_on_death()
+		return
+
 	for i in get_slide_collision_count():
 		var collision = get_slide_collision(i)
 		var collider = collision.get_collider()
