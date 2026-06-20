@@ -72,6 +72,8 @@ var _fused_collision: CollisionShape2D
 var _fused_sprite: AnimatedSprite2D
 var _fused_col_offset: Vector2
 var _fused_pass_half_y: float
+# the passenger's player_id
+var _fused_player_id: int = 1
 
 # where we were at the start of the current frame
 # (so we can move a player riding us)
@@ -178,11 +180,12 @@ func _fuse_with(passenger: Player) -> void:
 	passenger._set_riding(false)
 	passenger.velocity = Vector2.ZERO
 
-	# remember their geometry
+	# remember their geometry n stuff
 	var pass_col := passenger._collision
 	var pass_sprite := passenger.anim
 	_fused_col_offset = pass_col.position
 	_fused_pass_half_y = (pass_col.shape as RectangleShape2D).size.y * 0.5
+	_fused_player_id = passenger.player_id
 
 	# absorb their ~~body~~ collision shape
 	passenger.remove_child(pass_col)
@@ -316,20 +319,20 @@ func _set_anim() -> void:
 	# up
 	if velocity.y < 0:
 		if abs(velocity.x) == 0:
-			anim_name = "up"
+			anim_name = "down"
 		if abs(velocity.x) > 0:
 			anim_name = "move_up"
 	
-	if player_id != 1:
-		anim_name += "2"
-	
-	anim.play(anim_name)
+	anim.play(_colour_variant(anim_name))
 
-	# the fused passenger mirrors our animation state
+	# the fused passenger mirrors our motion but keeps its OWN colour
 	if _fused and is_instance_valid(_fused_sprite):
-		_fused_sprite.animation = anim.animation
+		_fused_sprite.play(_colour_variant(anim_name, _fused_player_id))
 		_fused_sprite.flip_h = anim.flip_h
 		_fused_sprite.frame = anim.frame
+
+func _colour_variant(base, id := player_id) -> String:
+	return base + "2" if id != 1 else base
 
 func _on_death() -> void:
 	if !is_dead:
