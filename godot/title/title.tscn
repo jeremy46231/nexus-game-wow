@@ -6,6 +6,21 @@
 [ext_resource type="Texture2D" uid="uid://cg5j11rtv77gx" path="res://player/buttonBlueUp.png" id="4_8xu2e"]
 [ext_resource type="Texture2D" uid="uid://drtty6poiif7g" path="res://player/buttonBlueDown.png" id="5_0tjwc"]
 
+[sub_resource type="InputEventKey" id="InputEventKey_8xu2e"]
+device = -1
+keycode = 32
+unicode = 32
+
+[sub_resource type="Shortcut" id="Shortcut_uqv1u"]
+events = [SubResource("InputEventKey_8xu2e")]
+
+[sub_resource type="InputEventKey" id="InputEventKey_0tjwc"]
+device = -1
+keycode = 4194305
+
+[sub_resource type="Shortcut" id="Shortcut_0tjwc"]
+events = [SubResource("InputEventKey_0tjwc")]
+
 [node name="Title" type="Node2D" unique_id=1310818328]
 script = ExtResource("1_yx5l7")
 
@@ -16,6 +31,7 @@ offset_top = 118.0
 offset_right = 139.0
 offset_bottom = 134.0
 scale = Vector2(4, 4)
+shortcut = SubResource("Shortcut_uqv1u")
 texture_normal = ExtResource("2_nx56k")
 texture_hover = ExtResource("3_6s8lb")
 
@@ -26,6 +42,7 @@ offset_top = 121.0
 offset_right = 331.0
 offset_bottom = 137.0
 scale = Vector2(4, 4)
+shortcut = SubResource("Shortcut_0tjwc")
 texture_normal = ExtResource("4_8xu2e")
 texture_hover = ExtResource("5_0tjwc")
 
