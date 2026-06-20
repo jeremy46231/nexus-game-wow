@@ -105,6 +105,11 @@ func _physics_process(delta: float) -> void:
 	# TODO: do
 	if Input.is_action_just_pressed(teleport_action):
 		pass
+		
+	if Input.is_action_just_pressed("exit"):
+		if !is_dead:
+			is_dead = true
+			get_tree().change_scene_to_file("res://main/main.tscn")
 
 	_set_anim()
 
@@ -243,7 +248,8 @@ func _set_anim() -> void:
 func _on_death() -> void:
 	if !is_dead:
 		is_dead = true
-		get_tree().change_scene_to_file("res://title/title.tscn")
+		get_tree().change_scene_to_file("res://main/main.tscn")
+		# get_tree().change_scene_to_file("res://title/title.tscn")
 
 func check_collisions() -> void:
 	for i in get_slide_collision_count():
