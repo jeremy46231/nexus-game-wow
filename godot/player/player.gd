@@ -6,12 +6,15 @@ extends CharacterBody2D
 
 const title = preload("res://title/title.tscn")
 
+@export var player_id: int = 1
+
 # keybinds
 @export var jump_action: StringName = "p1_jump"
 @export var left_action: StringName = "p1_left"
 @export var right_action: StringName = "p1_right"
 @export var smol_action: StringName = "p1_smol"
 @export var call_action: StringName = "p1_call"
+
 
 # the other player (wired up in the scene)
 @export var other_player: Player
@@ -31,9 +34,9 @@ const SMOL_SPRITE_SCALE := Vector2(0.5, 0.5)
 # movement vars
 # horizontal
 const speed: float = 300.0
-const acceleration: float = 2000.0
+const acceleration: float = 4000.0
 const friction: float = 2400.0
-const air_acceleration: float = 1200.0
+const air_acceleration: float = 2000.0
 const air_friction: float = 400.0
 # jump
 const jump_velocity: float = -400.0
@@ -49,6 +52,9 @@ const coyote_time: float = 0.1
 const jump_buffer_time: float = 0.1
 # how far above the resting gap a rider can drift before it detaches
 const ride_gap_slack: float = 3.0
+
+# fall below this y and you boom
+const death_y: float = 2000.0
 
 # timers
 var _coyote_timer: float = 0.0
@@ -289,31 +295,32 @@ func _stick_to(carrier: Player) -> void:
 	velocity.y = carrier.velocity.y
 
 func _set_anim() -> void:
+	
+	var anim_name
 	if velocity.y == 0:
-		if velocity.x == 0:
-			anim.play("idle")
-		if velocity.x > 0:
-			anim.play("right")
-		if velocity.x < 0:
-			anim.play("left")
+		if abs(velocity.x) == 0:
+			anim_name = "idle"
+		if abs(velocity.x) > 0:
+			anim_name = "move"
 
 	# down
 	if velocity.y > 0:
-		if velocity.x == 0:
-			anim.play("down")
-		if velocity.x > 0:
-			anim.play("right_down")
-		if velocity.x < 0:
-			anim.play("left_down")
+		if abs(velocity.x) == 0:
+			anim_name = "down"
+		if abs(velocity.x) > 0:
+			anim_name = "move_down"
 
 	# up
 	if velocity.y < 0:
-		if velocity.x == 0:
-			anim.play("up")
-		if velocity.x > 0:
-			anim.play("right_up")
-		if velocity.x < 0:
-			anim.play("left_up")
+		if abs(velocity.x) == 0:
+			anim_name = "down"
+		if abs(velocity.x) > 0:
+			anim_name = "move_up"
+	
+	if player_id != 1:
+		anim_name += "2"
+	
+	anim.play(anim_name)
 
 	# the fused passenger mirrors our animation state
 	if _fused and is_instance_valid(_fused_sprite):
@@ -324,10 +331,13 @@ func _set_anim() -> void:
 func _on_death() -> void:
 	if !is_dead:
 		is_dead = true
-		get_tree().change_scene_to_file("res://main/main.tscn")
-		# get_tree().change_scene_to_file("res://title/title.tscn")
+		get_tree().change_scene_to_file("res://title/title.tscn")
 
 func check_collisions() -> void:
+	if global_position.y > death_y:
+		_on_death()
+		return
+
 	for i in get_slide_collision_count():
 		var collision = get_slide_collision(i)
 		var collider = collision.get_collider()
