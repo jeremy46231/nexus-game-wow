@@ -2,6 +2,8 @@ class_name Player
 extends CharacterBody2D
 
 @onready var anim: AnimatedSprite2D = $AnimatedSprite2D
+@onready var _collision: CollisionShape2D = $CollisionShape2D
+
 const title = preload("res://title/title.tscn")
 
 # keybinds
@@ -9,14 +11,22 @@ const title = preload("res://title/title.tscn")
 @export var left_action: StringName = "p1_left"
 @export var right_action: StringName = "p1_right"
 @export var smol_action: StringName = "p1_smol"
-@export var teleport_action: StringName = "p1_teleport"
+@export var call_action: StringName = "p1_call"
 
 # the other player (wired up in the scene)
 @export var other_player: Player
 
 var is_dead = false
-var isSmol := false;
-const SCALE_FACTOR := 0.5
+var isSmol := false
+
+# smol shrinks the collision shape + sprite rather than scaling the body node:
+# scaling a CharacterBody2D breaks collisions and would wreck the fused "call" state.
+# (full bottom edge sits at +8, smol at +4, so the feet line up the same way)
+const FULL_SHAPE_SIZE := Vector2(15.75, 15.75)
+const SMOL_SHAPE_SIZE := Vector2(7.875, 7.875)
+const FULL_SHAPE_OFFSET := Vector2(0, 0.125)
+const SMOL_SHAPE_OFFSET := Vector2(0, 0.0625)
+const SMOL_SPRITE_SCALE := Vector2(0.5, 0.5)
 
 # movement vars
 # horizontal
@@ -48,12 +58,24 @@ var _buffer_timer: float = 0.0
 # until we jump or slide off the edge
 var _riding: bool = false
 
+# permanently fused with the other player (we're the host/driver, they've been
+# absorbed into us)
+var _fused: bool = false
+# the absorbed passenger's nodes and geometry
+var _fused_collision: CollisionShape2D
+var _fused_sprite: AnimatedSprite2D
+var _fused_col_offset: Vector2
+var _fused_pass_half_y: float
+
 # where we were at the start of the current frame
 # (so we can move a player riding us)
 var _frame_start_pos: Vector2
 
 func _ready() -> void:
 	_frame_start_pos = global_position
+	# private copy of the shape so resizing for smol doesn't mutate the other
+	# player's (potentially shared) shape resource
+	_collision.shape = _collision.shape.duplicate()
 
 func _physics_process(delta: float) -> void:
 	_frame_start_pos = global_position
@@ -100,16 +122,14 @@ func _physics_process(delta: float) -> void:
 		# not pressing move, slow down
 		var fric := friction if on_floor else air_friction
 		velocity.x = move_toward(velocity.x, 0.0, fric * delta)
-
-	# teleport / "call" the other player to us
-	# TODO: do
-	if Input.is_action_just_pressed(teleport_action):
-		pass
 		
 	if Input.is_action_just_pressed("exit"):
 		if !is_dead:
 			is_dead = true
 			get_tree().change_scene_to_file("res://main/main.tscn")
+	# "call" the other player
+	if Input.is_action_just_pressed(call_action) and is_instance_valid(other_player):
+		_fuse_with(other_player)
 
 	_set_anim()
 
@@ -133,14 +153,64 @@ func _set_riding(value: bool) -> void:
 func _set_smol(value: bool) -> void:
 	if isSmol == value:
 		return
-	isSmol = value;
-	scale = Vector2(SCALE_FACTOR, SCALE_FACTOR) if value else Vector2(1, 1)
+	isSmol = value
+	var rect := _collision.shape as RectangleShape2D
+	rect.size = SMOL_SHAPE_SIZE if value else FULL_SHAPE_SIZE
+	_collision.position = SMOL_SHAPE_OFFSET if value else FULL_SHAPE_OFFSET
+	anim.scale = SMOL_SPRITE_SCALE if value else Vector2.ONE
+	_reposition_fused()
 
 func _get_half_size() -> Vector2:
 	return Vector2(4, 4) if isSmol else Vector2(8, 8)
 	
 func _get_other_half_size() -> Vector2:
 	return Vector2(4, 4) if other_player.isSmol else Vector2(8, 8)
+
+# permanently fuse the other player on top of us
+func _fuse_with(passenger: Player) -> void:
+	_set_riding(false)
+	passenger._set_riding(false)
+	passenger.velocity = Vector2.ZERO
+
+	# remember their geometry
+	var pass_col := passenger._collision
+	var pass_sprite := passenger.anim
+	_fused_col_offset = pass_col.position
+	_fused_pass_half_y = (pass_col.shape as RectangleShape2D).size.y * 0.5
+
+	# absorb their ~~body~~ collision shape
+	passenger.remove_child(pass_col)
+	pass_col.name = "FusedCollision"
+	add_child(pass_col)
+	_fused_collision = pass_col
+
+	# absorb their ~~soul~~ sprite
+	passenger.remove_child(pass_sprite)
+	pass_sprite.name = "FusedSprite"
+	add_child(pass_sprite)
+	_fused_sprite = pass_sprite
+
+	other_player = null
+	_fused = true
+	_reposition_fused()
+
+	# kill the passenger !!! murder
+	passenger.set_physics_process(false)
+	passenger.set_process(false)
+	passenger.other_player = null
+	passenger.queue_free()
+
+
+# keep the fused passenger on our top edge, centred
+func _reposition_fused() -> void:
+	if not _fused:
+		return
+	var host_half_y := (_collision.shape as RectangleShape2D).size.y * 0.5
+	var host_top := global_position.y + _collision.position.y - host_half_y
+	# the passenger origin that puts its shape bottom exactly on our top edge
+	var origin := Vector2(global_position.x, host_top - _fused_pass_half_y - _fused_col_offset.y)
+	_fused_collision.global_position = origin + _fused_col_offset
+	_fused_sprite.global_position = origin
 
 # bounding box, global
 func _rect() -> Rect2:
@@ -244,6 +314,12 @@ func _set_anim() -> void:
 			anim.play("right_up")
 		if velocity.x < 0:
 			anim.play("left_up")
+
+	# the fused passenger mirrors our animation state
+	if _fused and is_instance_valid(_fused_sprite):
+		_fused_sprite.animation = anim.animation
+		_fused_sprite.flip_h = anim.flip_h
+		_fused_sprite.frame = anim.frame
 
 func _on_death() -> void:
 	if !is_dead:
