@@ -133,8 +133,8 @@ func _resolve_other() -> void:
 	# already riding: keep sticking until we slide off the side or the carrier
 	# rises above us (e.g. we got stopped by a ceiling)
 	if _riding:
-		var dx := absf(global_position.x - other_player.global_position.x)
-		var gap := other_player.global_position.y - global_position.y
+		var dx := absf(global_position.x - other_player._frame_start_pos.x)
+		var gap := other_player._frame_start_pos.y - global_position.y
 		if dx < 2.0 * HALF.x and gap > 0.0 and gap < 6.0 * HALF.y:
 			# stick to them
 			_stick_to(other_player)
