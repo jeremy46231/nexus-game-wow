@@ -30,6 +30,9 @@ const SMOL_SHAPE_SIZE := Vector2(7.875, 7.875)
 const FULL_SHAPE_OFFSET := Vector2(0, 0.125)
 const SMOL_SHAPE_OFFSET := Vector2(0, 0.0625)
 const SMOL_SPRITE_SCALE := Vector2(0.5, 0.5)
+# wen smol, smol the physics too
+const SMOL_SPEED_SCALE := 0.75
+const SMOL_JUMP_SCALE := sqrt(0.5) # peak is proportional to velocity^2
 
 # movement vars
 # horizontal
@@ -105,7 +108,7 @@ func _physics_process(delta: float) -> void:
 
 	# jump (if buffered jump, allow coyote too)
 	if _buffer_timer > 0.0 and _coyote_timer > 0.0:
-		velocity.y = jump_velocity
+		velocity.y = jump_velocity * (SMOL_JUMP_SCALE if isSmol else 1.0)
 		_buffer_timer = 0.0
 		_coyote_timer = 0.0
 		_set_riding(false)
@@ -114,17 +117,17 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_released(jump_action) and velocity.y < 0.0:
 		velocity.y *= jump_cut_factor
 
-	# shrink / grow toggle
+	# shrink (permanent -- no growing back)
 	if Input.is_action_just_pressed(smol_action):
-		# _set_smol(true)
-		_set_smol(!isSmol)
+		_set_smol(true)
 
 	# horizontal movement
 	var direction := Input.get_axis(left_action, right_action)
+	var target_speed := speed * (SMOL_SPEED_SCALE if isSmol else 1.0)
 	if direction != 0.0:
 		# horizontal move pressed
 		var accel := acceleration if on_floor else air_acceleration
-		velocity.x = move_toward(velocity.x, direction * speed, accel * delta)
+		velocity.x = move_toward(velocity.x, direction * target_speed, accel * delta)
 		anim.flip_h = direction < 0.0
 	else:
 		# not pressing move, slow down
