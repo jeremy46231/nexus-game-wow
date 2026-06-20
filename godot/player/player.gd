@@ -238,6 +238,9 @@ func _resolve_other() -> void:
 			# we aren't close enough to stick anymore
 			_set_riding(false)
 		return
+	
+	if other_player._riding:
+		return
 
 	var a := _rect()
 	var b := other_player._rect()
