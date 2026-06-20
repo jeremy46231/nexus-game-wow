@@ -316,7 +316,7 @@ func _set_anim() -> void:
 	# up
 	if velocity.y < 0:
 		if abs(velocity.x) == 0:
-			anim_name = "down"
+			anim_name = "up"
 		if abs(velocity.x) > 0:
 			anim_name = "move_up"
 	
