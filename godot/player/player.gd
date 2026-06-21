@@ -31,7 +31,7 @@ const FULL_SHAPE_OFFSET := Vector2(0, 0.125)
 const SMOL_SHAPE_OFFSET := Vector2(0, 0.0625)
 const SMOL_SPRITE_SCALE := Vector2(0.5, 0.5)
 # wen smol, smol the physics too
-const SMOL_SPEED_SCALE := 0.75
+const SMOL_SPEED_SCALE := 0.50
 const SMOL_JUMP_SCALE := sqrt(0.5) # peak is proportional to velocity^2
 
 # movement vars
