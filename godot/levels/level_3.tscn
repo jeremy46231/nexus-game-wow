@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://d2urj771sbdvu" path="res://main/assets/bgTiles.png" id="2_20opy"]
 [ext_resource type="Texture2D" uid="uid://bon4dhg1ocp3c" path="res://main/assets/collisionTiles.png" id="3_8l0e1"]
 [ext_resource type="PackedScene" uid="uid://dw04n8x2qke1l" path="res://winzone/winzone.tscn" id="4_lfnxh"]
-[ext_resource type="Texture2D" uid="uid://d204wyejdtyxn" path="res://main/controlAssets/smolcontrols.png" id="5_20opy"]
+[ext_resource type="Texture2D" uid="uid://snh8hx0hec2m" path="res://main/controlAssets/smolcontrols.png" id="5_20opy"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_kfbq2"]
 texture = ExtResource("2_20opy")
