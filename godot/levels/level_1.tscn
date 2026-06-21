@@ -157,11 +157,11 @@ position = Vector2(30, 193)
 position = Vector2(256, 144)
 
 [node name="Basiccontrols" type="Sprite2D" parent="." unique_id=959717828]
-position = Vector2(48.000008, 168)
-scale = Vector2(0.75, 0.75)
+position = Vector2(32, 168)
+scale = Vector2(0.8749999, 0.8749999)
 texture = ExtResource("5_btoec")
 
 [node name="Reset" type="Sprite2D" parent="." unique_id=1828298958]
-position = Vector2(136, 168)
-scale = Vector2(0.75, 0.75)
+position = Vector2(128, 168)
+scale = Vector2(0.8749999, 0.8749999)
 texture = ExtResource("6_gwceb")
