@@ -5,6 +5,13 @@ extends CharacterBody2D
 @onready var _collision: CollisionShape2D = $CollisionShape2D
 
 const title = preload("res://title/title.tscn")
+const desaturate_shader = preload("res://player/desaturate.gdshader")
+
+# how the fused-on-top passenger is tinted
+# saturation: 0 = grey, 1 = full colour
+# lightness:  0 = untouched, 1 = full white
+const FUSED_SATURATION := 0.65
+const FUSED_LIGHTNESS := 0.25
 
 @export var player_id: int = 1
 
@@ -201,6 +208,13 @@ func _fuse_with(passenger: Player) -> void:
 	pass_sprite.name = "FusedSprite"
 	add_child(pass_sprite)
 	_fused_sprite = pass_sprite
+
+	# tint the one fused on top
+	var mat := ShaderMaterial.new()
+	mat.shader = desaturate_shader
+	mat.set_shader_parameter("saturation", FUSED_SATURATION)
+	mat.set_shader_parameter("lightness", FUSED_LIGHTNESS)
+	_fused_sprite.material = mat
 
 	other_player = null
 	_fused = true
