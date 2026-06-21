@@ -1,0 +1,48 @@
+[gd_scene format=3 uid="uid://ddry6htygt1c7"]
+
+[ext_resource type="Texture2D" uid="uid://bon4dhg1ocp3c" path="res://main/assets/collisionTiles.png" id="1_da68d"]
+[ext_resource type="Script" uid="uid://cdwssgda0eubf" path="res://pressure_plate/pressure_plate.gd" id="1_uiy6i"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_rpue8"]
+size = Vector2(10, 15)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rpue8"]
+atlas = ExtResource("1_da68d")
+region = Rect2(96, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_uiy6i"]
+atlas = ExtResource("1_da68d")
+region = Rect2(96, 16, 16, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_lgort"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rpue8")
+}],
+"loop": 1,
+"name": &"down",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_uiy6i")
+}],
+"loop": 1,
+"name": &"up",
+"speed": 5.0
+}]
+
+[node name="PressurePlate" type="Area2D" unique_id=1567437349]
+script = ExtResource("1_uiy6i")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=851759678]
+position = Vector2(0, -0.5)
+shape = SubResource("RectangleShape2D_rpue8")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1715017076]
+sprite_frames = SubResource("SpriteFrames_lgort")
+animation = &"down"
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="body_exited" from="." to="." method="_on_body_exited"]
