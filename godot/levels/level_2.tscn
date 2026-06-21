@@ -1,4 +1,4 @@
-[gd_scene format=4 uid="uid://cves4fjmqm6ol"]
+[gd_scene format=4 uid="uid://b4xoim87ledlt"]
 
 [ext_resource type="Script" uid="uid://ro4nsj5qjut0" path="res://levels/level.gd" id="0_level"]
 [ext_resource type="PackedScene" uid="uid://ddry6htygt1c7" path="res://pressure_plate/pressure_plate.tscn" id="2_c651c"]
@@ -121,8 +121,9 @@ custom_data_layer_1/name = "plate"
 custom_data_layer_1/type = 1
 sources/0 = SubResource("TileSetAtlasSource_xwkvk")
 
-[node name="Level" type="Node2D" unique_id=401263267]
+[node name="Level2" type="Node2D" unique_id=401263267]
 script = ExtResource("0_level")
+smol_avail = false
 
 [node name="CameraArea" type="ReferenceRect" parent="." unique_id=556825393]
 offset_left = -128.0

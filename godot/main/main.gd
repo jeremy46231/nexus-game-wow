@@ -18,7 +18,7 @@ const WIN_DWELL := 0.3
 var _win_timer: float = 0.0
 var _won: bool = false
 
-@export var _level: Level
+var _level: Level
 
 var _default_zoom: float
 
@@ -39,6 +39,12 @@ func _load_level(index: int) -> void:
 	# drop the players on their spawn points
 	_players[0].global_position = _level.spawn_1.global_position
 	_players[1].global_position = _level.spawn_2.global_position
+
+	# let the level enable/disable abilities
+	for p in _players:
+		if is_instance_valid(p):
+			p.smol_avail = _level.smol_avail
+			p.call_avail = _level.call_avail
 
 	# snap straight to the computed framing (no startup lerp)
 	var alive := _players.filter(func(p): return is_instance_valid(p))

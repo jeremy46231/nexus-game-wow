@@ -11,9 +11,6 @@ extends Node2D
 # the camera tries to keep its view inside this rect (editor-only outline)
 @onready var camera_area: ReferenceRect = $CameraArea
 
-func _ready() -> void:
-	add_to_group("level")
-
 
 # the camera area as a world-space Rect2
 func camera_rect() -> Rect2:
