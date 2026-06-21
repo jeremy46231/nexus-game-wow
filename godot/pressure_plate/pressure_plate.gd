@@ -1,6 +1,8 @@
 extends Area2D
 
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
+@export var _doors: Array[Door]
+
 
 
 @export var triggered: bool = false
@@ -15,3 +17,6 @@ func _on_body_entered(body: Node2D) -> void:
 		print(body.name)
 		triggered = true
 		sprite.play("down")
+		for i in _doors:
+			i.closed = !i.closed
+		

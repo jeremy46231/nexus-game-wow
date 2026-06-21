@@ -45,12 +45,12 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_42tme"]
 size = Vector2(16, 16)
 
-[node name="Door" type="RigidBody2D" unique_id=1638723847]
+[node name="Door" type="StaticBody2D" unique_id=545139261]
 script = ExtResource("1_rdd60")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1537290502]
 sprite_frames = SubResource("SpriteFrames_bfe8f")
-animation = &"closeLeft"
+animation = &"open"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1839722458]
 shape = SubResource("RectangleShape2D_42tme")

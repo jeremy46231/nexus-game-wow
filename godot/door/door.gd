@@ -1,13 +1,25 @@
-extends RigidBody2D
+class_name Door
+extends StaticBody2D
 
-@export var closed: bool = false
+@onready var anim: AnimatedSprite2D = $AnimatedSprite2D
+@onready var collision: CollisionShape2D = $CollisionShape2D
 
+@export var closed: bool = false:
+	set(value):
+		closed = value
+		if is_node_ready():
+			update_state()
 
-# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass # Replace with function body.
+	update_state()
+	
+func _physics_process(delta: float) -> void:
+	update_state()
 
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
+func update_state() -> void:
+	if closed:
+		anim.play("close")
+		collision.set_deferred("disabled", false)
+	else:
+		anim.play("open")
+		collision.set_deferred("disabled", true)
