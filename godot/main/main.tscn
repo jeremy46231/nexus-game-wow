@@ -4,8 +4,8 @@
 [ext_resource type="PackedScene" uid="uid://ddry6htygt1c7" path="res://pressure_plate/pressure_plate.tscn" id="2_c651c"]
 [ext_resource type="PackedScene" uid="uid://bf31bu5f18p28" path="res://player/player.tscn" id="2_pjrb6"]
 [ext_resource type="Texture2D" uid="uid://bon4dhg1ocp3c" path="res://main/assets/collisionTiles.png" id="3_xwkvk"]
-[ext_resource type="PackedScene" uid="uid://dw04n8x2qke1l" path="res://winzone/winzone.tscn" id="5_winzn"]
 [ext_resource type="Texture2D" uid="uid://d2urj771sbdvu" path="res://main/assets/bgTiles.png" id="4_3wy1v"]
+[ext_resource type="PackedScene" uid="uid://dw04n8x2qke1l" path="res://winzone/winzone.tscn" id="5_winzn"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_kfbq2"]
 texture = ExtResource("4_3wy1v")
@@ -150,7 +150,7 @@ call_action = &"p2_call"
 other_player = NodePath("../Player")
 
 [node name="WinZone" parent="." unique_id=1240630372 instance=ExtResource("5_winzn")]
-position = Vector2(1904, 184)
+position = Vector2(464, 216)
 
 [node name="Player" parent="." unique_id=428086679 node_paths=PackedStringArray("other_player") instance=ExtResource("2_pjrb6")]
 position = Vector2(-1, 192)
