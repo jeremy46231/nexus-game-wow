@@ -143,7 +143,7 @@ tile_map_data = PackedByteArray("AAABAA8AAAAAAAIAAAACAA8AAAAAAAIAAAADAA8AAAAAAAI
 tile_set = SubResource("TileSet_mjj8b")
 
 [node name="PressurePlate" parent="." unique_id=1567437349 node_paths=PackedStringArray("_doors") instance=ExtResource("2_c651c")]
-position = Vector2(275, 157)
+position = Vector2(280, 176)
 _doors = [NodePath("../Door"), NodePath("../Door2"), NodePath("../Door3")]
 
 [node name="WinZone" parent="." unique_id=1240630372 instance=ExtResource("5_winzn")]
