@@ -24,8 +24,7 @@ events = [SubResource("InputEventKey_0tjwc")]
 [node name="Title" type="Node2D" unique_id=1310818328]
 script = ExtResource("1_yx5l7")
 
-[node name="TitleLabel" type="Label" parent="."]
-offset_left = 0.0
+[node name="TitleLabel" type="Label" parent="." unique_id=1117658576]
 offset_top = 48.0
 offset_right = 512.0
 offset_bottom = 96.0
