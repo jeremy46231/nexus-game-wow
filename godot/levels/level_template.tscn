@@ -139,5 +139,3 @@ position = Vector2(24, 200)
 [node name="Spawn2" type="Marker2D" parent="." unique_id=1562135805]
 position = Vector2(56, 200)
 
-[node name="CameraStart" type="Marker2D" parent="." unique_id=880521207]
-position = Vector2(256, 144)

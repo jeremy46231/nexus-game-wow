@@ -19,9 +19,7 @@ var _won: bool = false
 
 var _level: Level
 
-# camera bounds
 var _default_zoom: float
-var _fixed_y: float
 
 
 func _ready() -> void:
@@ -41,10 +39,11 @@ func _load_level(index: int) -> void:
 	_players[0].global_position = _level.spawn_1.global_position
 	_players[1].global_position = _level.spawn_2.global_position
 
-	# anchor the camera to this level's start marker
-	camera.global_position = _level.camera_start.global_position
-	camera.zoom = Vector2(_default_zoom, _default_zoom)
-	_fixed_y = _level.camera_start.global_position.y
+	# snap straight to the computed framing (no startup lerp)
+	var alive := _players.filter(func(p): return is_instance_valid(p))
+	var pos := _camera_pos(alive)
+	camera.global_position = pos
+	camera.zoom = Vector2.ONE * _camera_zoom(alive, pos)
 
 	_won = false
 	_win_timer = 0.0
@@ -55,32 +54,38 @@ func _physics_process(delta: float) -> void:
 	if alive.is_empty():
 		return
 
-	# follow the midpoint x, clamped
-	var sum_x := 0.0
-	for p in alive:
-		sum_x += p.global_position.x
-	var center_x: float = sum_x / alive.size()
-	var target_pos := Vector2(center_x, _fixed_y)
+	var target_pos := _camera_pos(alive)
+	var target_zoom := _camera_zoom(alive, target_pos)
 
-	# zoom out until every player fits
-	var half := FOCUS_FRACTION * 0.5
-	var view := get_viewport_rect().size
-	var target_zoom := _default_zoom
-	for p in alive:
-		var dx: float = absf(p.global_position.x - center_x)
-		var dy: float = absf(p.global_position.y - _fixed_y)
-		if dx > 0.0:
-			target_zoom = minf(target_zoom, view.x * half / dx)
-		if dy > 0.0:
-			target_zoom = minf(target_zoom, view.y * half / dy)
-
-	# smooth toward the target
+	# smooth toward the computed target
 	var t := 1.0 - exp(-CAM_SMOOTH * delta)
 	camera.global_position = camera.global_position.lerp(target_pos, t)
-	camera.zoom = camera.zoom.lerp(Vector2(target_zoom, target_zoom), t)
+	camera.zoom = camera.zoom.lerp(Vector2.ONE * target_zoom, t)
 
 	if not _won:
 		_check_win(alive, delta)
+
+
+# centre of the alive players
+func _camera_pos(alive: Array) -> Vector2:
+	var sum := Vector2.ZERO
+	for p in alive:
+		sum += p.global_position
+	return sum / alive.size()
+
+
+# zoom out until every player fits within FOCUS_FRACTION of the view
+func _camera_zoom(alive: Array, center: Vector2) -> float:
+	var half := FOCUS_FRACTION * 0.5
+	var view := get_viewport_rect().size
+	var zoom := _default_zoom
+	for p in alive:
+		var d: Vector2 = (p.global_position - center).abs()
+		if d.x > 0.0:
+			zoom = minf(zoom, view.x * half / d.x)
+		if d.y > 0.0:
+			zoom = minf(zoom, view.y * half / d.y)
+	return zoom
 
 
 # clear the level once every alive player is in the win zone together
