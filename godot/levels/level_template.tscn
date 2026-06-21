@@ -122,6 +122,15 @@ sources/0 = SubResource("TileSetAtlasSource_xwkvk")
 [node name="Level" type="Node2D" unique_id=4998155]
 script = ExtResource("0_level")
 
+[node name="CameraArea" type="ReferenceRect" parent="." unique_id=1839924967]
+offset_left = -32.0
+offset_top = -192.0
+offset_right = 688.0
+offset_bottom = 288.0
+mouse_filter = 2
+border_color = Color(1, 0.85, 0, 1)
+border_width = 2.0
+
 [node name="TileMapLayerBg" type="TileMapLayer" parent="." unique_id=922279342]
 tile_set = SubResource("TileSet_lgort")
 
@@ -138,4 +147,3 @@ position = Vector2(24, 200)
 
 [node name="Spawn2" type="Marker2D" parent="." unique_id=1562135805]
 position = Vector2(56, 200)
-

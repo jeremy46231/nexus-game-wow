@@ -41,9 +41,10 @@ func _load_level(index: int) -> void:
 
 	# snap straight to the computed framing (no startup lerp)
 	var alive := _players.filter(func(p): return is_instance_valid(p))
-	var pos := _camera_pos(alive)
-	camera.global_position = pos
-	camera.zoom = Vector2.ONE * _camera_zoom(alive, pos)
+	var center := _centroid(alive)
+	var zoom := _camera_zoom(alive, center)
+	camera.global_position = _shifted_pos(alive, center, zoom)
+	camera.zoom = Vector2.ONE * zoom
 
 	_won = false
 	_win_timer = 0.0
@@ -54,8 +55,9 @@ func _physics_process(delta: float) -> void:
 	if alive.is_empty():
 		return
 
-	var target_pos := _camera_pos(alive)
-	var target_zoom := _camera_zoom(alive, target_pos)
+	var center := _centroid(alive)
+	var target_zoom := _camera_zoom(alive, center)
+	var target_pos := _shifted_pos(alive, center, target_zoom)
 
 	# smooth toward the computed target
 	var t := 1.0 - exp(-CAM_SMOOTH * delta)
@@ -67,7 +69,7 @@ func _physics_process(delta: float) -> void:
 
 
 # centre of the alive players
-func _camera_pos(alive: Array) -> Vector2:
+func _centroid(alive: Array) -> Vector2:
 	var sum := Vector2.ZERO
 	for p in alive:
 		sum += p.global_position
@@ -86,6 +88,45 @@ func _camera_zoom(alive: Array, center: Vector2) -> float:
 		if d.y > 0.0:
 			zoom = minf(zoom, view.y * half / d.y)
 	return zoom
+
+
+# shift the camera (per axis) to keep the view inside the level's camera area,
+# never moving a player out of the middle FOCUS_FRACTION of the screen
+func _shifted_pos(alive: Array, center: Vector2, zoom: float) -> Vector2:
+	if _level == null or not is_instance_valid(_level.camera_area):
+		return center
+
+	var area := _level.camera_rect()
+	var view := get_viewport_rect().size
+
+	# players' bounding box
+	var pmin := center
+	var pmax := center
+	for p in alive:
+		pmin = pmin.min(p.global_position)
+		pmax = pmax.max(p.global_position)
+
+	var x := _shift_axis(center.x, pmin.x, pmax.x, view.x / zoom, area.position.x, area.end.x)
+	var y := _shift_axis(center.y, pmin.y, pmax.y, view.y / zoom, area.position.y, area.end.y)
+	return Vector2(x, y)
+
+
+# one axis of the shift. vis = full visible size on this axis (world units).
+func _shift_axis(center: float, pmin: float, pmax: float, vis: float, amin: float, amax: float) -> float:
+	var vh := vis * 0.5                  # visible half-size
+	var box80 := vh * FOCUS_FRACTION     # half-size of the must-contain-players box
+
+	# the area-driven target
+	var desired: float
+	if vis >= amax - amin:
+		desired = (amin + amax) * 0.5    # view bigger than the area -> centre on it
+	else:
+		desired = clampf(center, amin + vh, amax - vh)  # shift just enough to stay inside
+
+	# 80% framing is absolute: clamp the shift to the slack it allows
+	var lo := pmax - box80
+	var hi := pmin + box80
+	return clampf(desired, lo, hi)
 
 
 # clear the level once every alive player is in the win zone together

@@ -5,3 +5,10 @@ extends Node2D
 @onready var spawn_1: Marker2D = $Spawn1
 @onready var spawn_2: Marker2D = $Spawn2
 @onready var win_zone: Area2D = $WinZone
+# the camera tries to keep its view inside this rect (editor-only outline)
+@onready var camera_area: ReferenceRect = $CameraArea
+
+
+# the camera area as a world-space Rect2
+func camera_rect() -> Rect2:
+	return Rect2(camera_area.global_position, camera_area.size)
