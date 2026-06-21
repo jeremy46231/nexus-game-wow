@@ -361,8 +361,4 @@ func check_collisions() -> void:
 
 				if action_type:
 					_on_death()
-			
 
-
-func _on_plate_body_entered(body: Node) -> void:
-	_on_death()
