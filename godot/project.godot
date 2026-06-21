@@ -23,7 +23,7 @@ Game="*res://autoload/game.gd"
 
 window/size/viewport_width=512
 window/size/viewport_height=288
-window/stretch/mode="viewport"
+window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
 [input]
