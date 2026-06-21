@@ -2,7 +2,13 @@ extends Node2D
 
 @onready var camera: Camera2D = $Camera2D
 @onready var _players: Array = [$Player, $Player2]
-@onready var win_zone: Area2D = $WinZone
+@onready var _level_holder: Node2D = $CurrentLevel
+
+# ordered list of levels
+const LEVELS := [
+	"res://levels/level_1.tscn",
+	"res://levels/level_2.tscn",
+]
 
 const FOCUS_FRACTION := 0.8
 const CAM_SMOOTH := 8.0
@@ -11,16 +17,37 @@ const WIN_DWELL := 0.3
 var _win_timer: float = 0.0
 var _won: bool = false
 
-# captured at start
+var _level: Level
+
+# camera bounds
 var _default_zoom: float
-var _min_x: float
 var _fixed_y: float
 
 
 func _ready() -> void:
 	_default_zoom = camera.zoom.x
-	_min_x = camera.global_position.x
-	_fixed_y = camera.global_position.y
+	_load_level(Game.level)
+
+
+func _load_level(index: int) -> void:
+	# clear any previous level
+	for c in _level_holder.get_children():
+		c.queue_free()
+
+	_level = (load(LEVELS[index]) as PackedScene).instantiate()
+	_level_holder.add_child(_level)
+
+	# drop the players on their spawn points
+	_players[0].global_position = _level.spawn_1.global_position
+	_players[1].global_position = _level.spawn_2.global_position
+
+	# anchor the camera to this level's start marker
+	camera.global_position = _level.camera_start.global_position
+	camera.zoom = Vector2(_default_zoom, _default_zoom)
+	_fixed_y = _level.camera_start.global_position.y
+
+	_won = false
+	_win_timer = 0.0
 
 
 func _physics_process(delta: float) -> void:
@@ -32,7 +59,7 @@ func _physics_process(delta: float) -> void:
 	var sum_x := 0.0
 	for p in alive:
 		sum_x += p.global_position.x
-	var center_x: float = maxf(sum_x / alive.size(), _min_x)
+	var center_x: float = sum_x / alive.size()
 	var target_pos := Vector2(center_x, _fixed_y)
 
 	# zoom out until every player fits
@@ -58,8 +85,10 @@ func _physics_process(delta: float) -> void:
 
 # clear the level once every alive player is in the win zone together
 func _check_win(alive: Array, delta: float) -> void:
-	var in_zone := win_zone.get_overlapping_bodies().filter(func(b): return b is Player)
-	if not alive.is_empty() and in_zone.size() == alive.size():
+	if _level == null:
+		return
+	var in_zone := _level.win_zone.get_overlapping_bodies().filter(func(b): return b is Player)
+	if in_zone.size() == alive.size():
 		_win_timer += delta
 		if _win_timer >= WIN_DWELL:
 			_level_complete()
@@ -69,6 +98,11 @@ func _check_win(alive: Array, delta: float) -> void:
 
 func _level_complete() -> void:
 	_won = true
-	print("Level complete!")
-	# TODO: load the next level instead of restarting
-	get_tree().reload_current_scene()
+	Game.level += 1
+	if Game.level >= LEVELS.size():
+		# beat the last level -> back to the title
+		Game.level = 0
+		get_tree().change_scene_to_file("res://title/title.tscn")
+	else:
+		# reload for fresh player instances on the next level
+		get_tree().reload_current_scene()
