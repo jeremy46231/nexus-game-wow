@@ -3,7 +3,9 @@
 [ext_resource type="Script" uid="uid://ro4nsj5qjut0" path="res://levels/level.gd" id="0_level"]
 [ext_resource type="Texture2D" uid="uid://bon4dhg1ocp3c" path="res://main/assets/collisionTiles.png" id="3_xwkvk"]
 [ext_resource type="Texture2D" uid="uid://d2urj771sbdvu" path="res://main/assets/bgTiles.png" id="4_3wy1v"]
+[ext_resource type="Texture2D" uid="uid://fnvov37762of" path="res://main/controlAssets/basiccontrols.png" id="5_btoec"]
 [ext_resource type="PackedScene" uid="uid://dw04n8x2qke1l" path="res://winzone/winzone.tscn" id="5_winzn"]
+[ext_resource type="Texture2D" uid="uid://ccoi6wouj6fke" path="res://main/controlAssets/reset.png" id="6_gwceb"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_kfbq2"]
 texture = ExtResource("4_3wy1v")
@@ -153,3 +155,13 @@ position = Vector2(30, 193)
 
 [node name="CameraStart" type="Marker2D" parent="." unique_id=1652629765]
 position = Vector2(256, 144)
+
+[node name="Basiccontrols" type="Sprite2D" parent="." unique_id=959717828]
+position = Vector2(48.000008, 168)
+scale = Vector2(0.75, 0.75)
+texture = ExtResource("5_btoec")
+
+[node name="Reset" type="Sprite2D" parent="." unique_id=1828298958]
+position = Vector2(136, 168)
+scale = Vector2(0.75, 0.75)
+texture = ExtResource("6_gwceb")
