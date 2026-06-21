@@ -1,28 +1,26 @@
 extends Node2D
 const main = preload("res://main/main.tscn")
 
-@onready var no_gold: Sprite2D = $Pyramidbg
-@onready var gold: Sprite2D = $Pyramidbg2
+# the pyramid art is composed in this base resolution; it zooms to fit + centres
+# while the UI stays a fixed pixel size (the UI is anchored in the scene, not here)
+const DESIGN := Vector2(512, 288)
+
+@onready var background: Node2D = $Background
+@onready var no_gold: Sprite2D = $Background/Pyramidbg
+@onready var gold: Sprite2D = $Background/Pyramidbg2
 
 
 func _ready() -> void:
 	_update_bg()
-	# keep the bg fit + centred on any viewport size / aspect ratio
-	get_viewport().size_changed.connect(_fit_bg)
-	_fit_bg()
+	get_viewport().size_changed.connect(_layout)
+	_layout()
 
 
-# zoom the bg out so the whole image fits inside the viewport, and
-# centre it; the tile layer behind fills whatever space is left over
-func _fit_bg() -> void:
+func _layout() -> void:
 	var vp := get_viewport_rect().size
-	for s: Sprite2D in [no_gold, gold]:
-		if s.texture == null:
-			continue
-		var tex: Vector2 = s.texture.get_size()
-		var fit := minf(vp.x / tex.x, vp.y / tex.y)
-		s.scale = Vector2(fit, fit)
-		s.global_position = vp * 0.5
+	var fit := minf(vp.x / DESIGN.x, vp.y / DESIGN.y)
+	background.scale = Vector2(fit, fit)
+	background.position = vp * 0.5 - DESIGN * 0.5 * fit
 
 
 func _on_play_pressed() -> void:
