@@ -24,9 +24,9 @@ jobs:
       - name: Export all platforms
         working-directory: godot
         run: |
-          for d in build-1 windows linux macos; do mkdir -p "../build/$d"; done
+          for d in web windows linux macos; do mkdir -p "../build/$d"; done
           godot --headless --import
-          godot --headless --export-release "build-1"
+          godot --headless --export-release "Web"
           godot --headless --export-release "Windows"
           godot --headless --export-release "Linux"
           godot --headless --export-release "macOS"
@@ -37,7 +37,7 @@ jobs:
           (cd build/windows && zip -r ../../dist/nexus-game-wow-windows.zip .)
           (cd build/linux && zip -r ../../dist/nexus-game-wow-linux.zip .)
           cp build/macos/nexus-game-wow.zip dist/nexus-game-wow-macos.zip
-          (cd build/build-1 && zip -r ../../dist/nexus-game-wow-web.zip .)
+          (cd build/web && zip -r ../../dist/nexus-game-wow-web.zip .)
 
       - name: Update nightly release
         env:
@@ -53,7 +53,7 @@ jobs:
       # Store it gzipped (~10 MiB); worker.js serves it with Content-Encoding: gzip.
       # Done after packaging so the downloadable web zip keeps the raw wasm.
       - name: Compress wasm
-        run: gzip -9 -f build/build-1/index.wasm && mv build/build-1/index.wasm.gz build/build-1/index.wasm
+        run: gzip -9 -f build/web/index.wasm && mv build/web/index.wasm.gz build/web/index.wasm
 
       - name: Deploy web to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3

@@ -24,4 +24,3 @@ mono_crash.*.json
 /godot/dist/
 
 .wrangler/
-godot/export_presets.cfg
