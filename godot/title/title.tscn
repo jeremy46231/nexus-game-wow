@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://ddi1amvhlwqy4" path="res://main/assets/pyramidbg.png" id="2_0tjwc"]
 [ext_resource type="Texture2D" uid="uid://co2xk5fsff1qx" path="res://player/buttonRedUp.png" id="2_nx56k"]
 [ext_resource type="Texture2D" uid="uid://cx5e4v0tje380" path="res://player/buttonRedDown.png" id="3_6s8lb"]
+[ext_resource type="Texture2D" uid="uid://br4b3kqb5bhvl" path="res://main/assets/pyramidbggold.png" id="3_8xu2e"]
 
 [sub_resource type="InputEventKey" id="InputEventKey_8xu2e"]
 device = -1
@@ -20,6 +21,11 @@ script = ExtResource("1_yx5l7")
 position = Vector2(256.625, 140.50002)
 scale = Vector2(0.73249996, 0.7325001)
 texture = ExtResource("2_0tjwc")
+
+[node name="Pyramidbg2" type="Sprite2D" parent="." unique_id=1366293079]
+position = Vector2(256.625, 140.50002)
+scale = Vector2(0.73249996, 0.7325001)
+texture = ExtResource("3_8xu2e")
 
 [node name="TitleLabel" type="Label" parent="." unique_id=1695925784]
 offset_top = 5.0

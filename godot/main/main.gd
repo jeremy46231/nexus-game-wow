@@ -6,10 +6,10 @@ extends Node2D
 
 # ordered list of levels
 const LEVELS := [
-	"res://levels/level_1.tscn",
-	"res://levels/level_2.tscn",
-	"res://levels/level_3.tscn",
-	"res://levels/level_4.tscn",
+	# "res://levels/level_1.tscn",
+	# "res://levels/level_2.tscn",
+	# "res://levels/level_3.tscn",
+	# "res://levels/level_4.tscn",
 	"res://levels/end.tscn"
 ]
 
@@ -157,6 +157,12 @@ func _level_complete() -> void:
 	if Game.level >= LEVELS.size():
 		# beat the last level -> back to the title
 		Game.level = 0
+		if not FileAccess.file_exists("user://savegame.save"):
+			var save_file = FileAccess.open("user://savegame.save", FileAccess.WRITE)
+			var finished = JSON.stringify(true)
+			save_file.store_line(finished)
+			print("file written")
+
 		get_tree().change_scene_to_file("res://title/title.tscn")
 	else:
 		# reload for fresh player instances on the next level
