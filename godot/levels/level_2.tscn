@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://dw04n8x2qke1l" path="res://winzone/winzone.tscn" id="5_winzn"]
 [ext_resource type="PackedScene" uid="uid://dfdfkfs6apxk" path="res://door/door.tscn" id="6_btoec"]
 [ext_resource type="Texture2D" uid="uid://c135b3u5kcmrc" path="res://main/controlAssets/callcontrols.png" id="7_ep78u"]
+[ext_resource type="Texture2D" uid="uid://rg7hxcorlbs4" path="res://main/controlAssets/reset.png" id="8_dfjjl"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_kfbq2"]
 texture = ExtResource("4_3wy1v")
@@ -176,6 +177,11 @@ rotation = 1.5707964
 scale = Vector2(-1, 1)
 
 [node name="Callcontrols" type="Sprite2D" parent="." unique_id=2128079152]
-position = Vector2(32, 168)
+position = Vector2(-16, 152)
 scale = Vector2(0.8749999, 0.8749999)
 texture = ExtResource("7_ep78u")
+
+[node name="Reset" type="Sprite2D" parent="." unique_id=1798787287]
+position = Vector2(80.00001, 152)
+scale = Vector2(0.8749999, 0.8749999)
+texture = ExtResource("8_dfjjl")
