@@ -166,6 +166,12 @@ size = Vector2(15.75, 15.75)
 [node name="Player" type="CharacterBody2D" unique_id=428086679]
 collision_layer = 2
 script = ExtResource("1_oul6g")
+player_id = null
+jump_action = null
+left_action = null
+right_action = null
+smol_action = null
+call_action = null
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1793714119]
 texture_filter = 1

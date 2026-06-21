@@ -122,6 +122,8 @@ sources/0 = SubResource("TileSetAtlasSource_xwkvk")
 
 [node name="Level" type="Node2D" unique_id=401263267]
 script = ExtResource("0_level")
+call_avail = false
+smol_avail = false
 
 [node name="CameraArea" type="ReferenceRect" parent="." unique_id=556825393]
 offset_left = -128.0

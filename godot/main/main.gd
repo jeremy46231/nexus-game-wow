@@ -18,7 +18,7 @@ const WIN_DWELL := 0.3
 var _win_timer: float = 0.0
 var _won: bool = false
 
-var _level: Level
+@export var _level: Level
 
 var _default_zoom: float
 

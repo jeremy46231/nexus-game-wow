@@ -15,9 +15,8 @@ const title = preload("res://title/title.tscn")
 @export var smol_action: StringName = "p1_smol"
 @export var call_action: StringName = "p1_call"
 
-@export var call_avail: bool = true
-@export var smol_avail: bool = true
-
+var smol_avail = true
+var call_avail = true
 # the other player (wired up in the scene)
 @export var other_player: Player
 
@@ -89,6 +88,23 @@ func _ready() -> void:
 	# private copy of the shape so resizing for smol doesn't mutate the other
 	# player's (potentially shared) shape resource
 	_collision.shape = _collision.shape.duplicate()
+
+	var level = get_tree().get_first_node_in_group("level") as Level
+	#level returns Nil
+	if (level):
+		if ("smol_avail" in level):
+			smol_avail = level.smol_avail
+		if ("call_avail" in level):
+			call_avail = level.call_avail
+
+	# var parent = get_parent()
+	# if (parent && "_level" in parent):
+	# 	var level = parent.get_node(_level)
+	# 	if (level):
+	# 		if ("smol_aval" in level):
+	# 			smol_avail = level.smol_avail
+	# 		if ("call_avail" in level):
+	# 			call_avail = level.smol_avail
 
 func _physics_process(delta: float) -> void:
 	_frame_start_pos = global_position
