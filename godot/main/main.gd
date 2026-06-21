@@ -7,7 +7,8 @@ extends Node2D
 # ordered list of levels
 const LEVELS := [
 	"res://levels/level_1.tscn",
-	"res://levels/level_TODO_platformer.tscn",
+	"res://levels/level_2.tscn",
+	"res://levels/level_3.tscn"
 ]
 
 const FOCUS_FRACTION := 0.8

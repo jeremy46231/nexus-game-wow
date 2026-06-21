@@ -15,6 +15,8 @@ const title = preload("res://title/title.tscn")
 @export var smol_action: StringName = "p1_smol"
 @export var call_action: StringName = "p1_call"
 
+@export var call_avail: bool = true
+@export var smol_avail: bool = true
 
 # the other player (wired up in the scene)
 @export var other_player: Player
@@ -118,8 +120,8 @@ func _physics_process(delta: float) -> void:
 		velocity.y *= jump_cut_factor
 
 	# shrink (permanent -- no growing back)
-	if Input.is_action_just_pressed(smol_action):
-		_set_smol(true)
+	if Input.is_action_just_pressed(smol_action) and smol_avail:
+			_set_smol(true)
 
 	# horizontal movement
 	var direction := Input.get_axis(left_action, right_action)
@@ -139,7 +141,7 @@ func _physics_process(delta: float) -> void:
 			is_dead = true
 			get_tree().change_scene_to_file("res://main/main.tscn")
 	# "call" the other player
-	if Input.is_action_just_pressed(call_action) and is_instance_valid(other_player):
+	if Input.is_action_just_pressed(call_action) and is_instance_valid(other_player) and call_avail:
 		_fuse_with(other_player)
 
 	_set_anim()
